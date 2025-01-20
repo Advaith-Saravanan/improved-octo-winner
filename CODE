@@ -1,0 +1,268 @@
+#CODE
+
+
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   ENG.BOT
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+            transition: background-color 1s ease;
+            font-family: 'Dancing Script', cursive;
+        }
+  </style>
+ </head>
+ <body class="bg-gray-300">
+  <div class="container mx-auto p-4">
+   <header class="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 shadow-lg rounded-lg p-6 mb-8 flex items-center justify-between">
+    <div class="flex items-center">
+     <img alt="AI-generated image of a robot holding a pencil" class="mr-4 rounded-full border-2 border-gray-300" height="60" src="https://storage.googleapis.com/a1aa/image/yQ7KJWZrP2YHGNRORDEZY9t9MkQHr7xERMBAnIavDPuepM9JA.jpg" width="60"/>
+     <h1 class="text-4xl font-bold text-black" id="eng-bot-title">
+      ENG.BOT
+     </h1>
+    </div>
+    <div class="text-right">
+     <div class="text-lg font-semibold mb-2 text-black" id="clock">
+     </div>
+     <div class="flex items-center">
+      <button class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 mr-2" id="reset-timer">
+       Reset Timer
+      </button>
+      <button class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 mr-2" id="start-timer">
+       Start Timer
+      </button>
+      <button class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300" id="stop-timer">
+       Stop Timer
+      </button>
+     </div>
+     <div class="text-lg font-semibold mt-2 text-black" id="timer">
+     </div>
+    </div>
+   </header>
+   <main>
+    <section class="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 shadow-lg rounded-lg p-8 mb-8">
+     <h2 class="text-3xl font-bold text-gray-800 mb-6">
+      Submit Your Writing
+     </h2>
+     <form class="space-y-6" id="writing-form">
+      <div>
+       <label class="block text-gray-700 font-semibold mb-2" for="content">
+        Content
+       </label>
+       <textarea class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="content" name="content" placeholder="Paste your writing here" rows="10"></textarea>
+      </div>
+      <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-600 transition duration-300" type="submit">
+       Evaluate
+      </button>
+     </form>
+    </section>
+    <section class="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 shadow-lg rounded-lg p-8 mb-8 hidden" id="evaluation-results">
+     <h2 class="text-3xl font-bold text-gray-800 mb-6">
+      Evaluation Results
+     </h2>
+     <div class="space-y-6" id="results">
+     </div>
+    </section>
+    <section class="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 shadow-lg rounded-lg p-8 hidden" id="feedback-section">
+     <div class="text-gray-800 text-lg font-semibold mb-4" id="time-taken">
+     </div>
+     <h2 class="text-3xl font-bold text-gray-800 mb-6">
+      User Experience
+     </h2>
+     <form class="space-y-6" id="feedback-form">
+      <div>
+       <label class="block text-gray-700 font-semibold mb-2" for="experience">
+        How was your experience?
+       </label>
+       <select class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="experience" name="experience">
+        <option value="good">
+         Good
+        </option>
+        <option value="average">
+         Average
+        </option>
+        <option value="bad">
+         Bad
+        </option>
+       </select>
+      </div>
+      <div class="hidden" id="feedback-box">
+       <label class="block text-gray-700 font-semibold mb-2" for="feedback">
+        Please provide your feedback
+       </label>
+       <textarea class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="feedback" name="feedback" placeholder="Type your feedback here" rows="4"></textarea>
+      </div>
+      <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-600 transition duration-300" type="submit">
+       Submit Feedback
+      </button>
+     </form>
+     <div class="mt-6 hidden p-4 rounded-lg" id="feedback-message">
+     </div>
+    </section>
+   </main>
+  </div>
+  <audio id="background-music" loop="">
+   <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mpeg"/>
+   Your browser does not support the audio element.
+  </audio>
+  <audio id="notification-sound">
+   <source src="https://www.soundjay.com/button/sounds/button-3.mp3" type="audio/mpeg"/>
+   Your browser does not support the audio element.
+  </audio>
+  <script>
+   let timerInterval;
+        let startTime;
+        let elapsedTime = 0;
+        let timerRunning = false;
+
+        function startTimer() {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(() => {
+                elapsedTime = Date.now() - startTime;
+                document.getElementById('timer').textContent = `Timer  :  ${formatTime(elapsedTime)}`;
+            }, 1000);
+            timerRunning = true;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            elapsedTime = 0;
+            document.getElementById('timer').textContent = `Timer  :  ${formatTime(elapsedTime)}`;
+        }
+
+        function formatTime(time) {
+            const totalSeconds = Math.floor(time / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function pad(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const date = now.getDate();
+            const month = now.getMonth() + 1; // Months are zero-based
+            const year = now.getFullYear();
+            const time = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = `Date  :  ${date}/${month}/${year}  ;  Time  :  ${time}`;
+        }
+
+        document.getElementById('writing-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (!timerRunning) {
+                alert("Timer is off. Please start the timer to evaluate your writing.");
+                return;
+            }
+            const content = document.getElementById('content').value;
+            if (!content.trim()) {
+                alert("You can't evaluate unless you give us your writings.");
+                return;
+            }
+            stopTimer();
+            document.getElementById('time-taken').textContent = `You have taken ${formatTime(elapsedTime)} to write your content.`;
+            evaluateContent(content);
+        });
+
+        document.getElementById('content').addEventListener('focus', function() {
+            if (!timerRunning) {
+                alert("You can't type when the timer is off.");
+                this.blur();
+            }
+        });
+
+        function evaluateContent(content) {
+            const resultsSection = document.getElementById('evaluation-results');
+            const resultsDiv = document.getElementById('results');
+
+            const correctedContent = content.replace(/(\b[a-z])/g, function(match) {
+                return match.toUpperCase();
+            });
+
+            resultsDiv.innerHTML = `
+                <div class="p-6 bg-green-100 text-green-800 rounded-lg">
+                    <div class="mt-4 p-6 bg-yellow-100 text-yellow-800 rounded-lg">
+                        <h3 class="text-2xl font-bold">Corrected Writing:</h3>
+                        <p class="mt-2">${correctedContent}</p>
+                    </div>
+                </div>
+            `;
+
+            resultsSection.classList.remove('hidden');
+            document.getElementById('feedback-section').classList.remove('hidden');
+            playNotificationSound();
+            resetTimer();
+        }
+
+        document.getElementById('experience').addEventListener('change', function() {
+            document.getElementById('feedback-box').classList.toggle('hidden', this.value === 'good');
+        });
+
+        document.getElementById('feedback-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const feedbackMessage = document.getElementById('feedback-message');
+            feedbackMessage.innerHTML = this.experience.value === 'good' ? 
+                                        '<p class="text-green-800">Thank you for your feedback!</p>' :
+                                        this.experience.value === 'average' ? 
+                                        '<p class="text-yellow-800">Thank you for your feedback! We will strive to improve.</p>' :
+                                        '<p class="text-red-800">Sorry to hear this, we will improve.</p>';
+            
+            feedbackMessage.classList.remove('hidden');
+            document.getElementById('feedback-form').reset();
+            setTimeout(resetApp, 3000);
+            playNotificationSound();
+        });
+
+        function resetApp() {
+            document.getElementById('feedback-message').classList.add('hidden');
+            document.getElementById('evaluation-results').classList.add('hidden');
+            document.getElementById('feedback-section').classList.add('hidden');
+            document.getElementById('content').value = '';
+            elapsedTime = 0;
+            document.getElementById('timer').textContent = `Timer  :  ${formatTime(elapsedTime)}`;
+        }
+
+        function playNotificationSound() {
+            const notificationSound = document.getElementById('notification-sound');
+            notificationSound.play();
+        }
+
+        const colors = ['bg-gray-300', 'bg-blue-300', 'bg-green-300', 'bg-yellow-300', 'bg-red-300'];
+        let currentColorIndex = 0;
+
+        setInterval(() => {
+            document.body.classList.remove(...colors);
+            document.body.classList.add(colors[currentColorIndex]);
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+        }, 1000);
+
+        const backgroundMusic = document.getElementById('background-music');
+        backgroundMusic.volume = 0.5;
+        backgroundMusic.play();
+
+        document.getElementById('start-timer').addEventListener('click', startTimer);
+        document.getElementById('stop-timer').addEventListener('click', stopTimer);
+        document.getElementById('reset-timer').addEventListener('click', resetTimer);
+
+        setInterval(updateClock, 1000);
+
+        // Auto start the timer when the program starts
+        resetTimer();
+  </script>
+ </body>
+</html>
